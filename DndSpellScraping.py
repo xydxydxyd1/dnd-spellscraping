@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 desc_end = 4
                 while True:
                     break
-                print(pars[desc_start:desc_end])
+                print(pars[4])
 
                 # Check for upcasting
                 spellpage_emp = spellpage_bs.find_all("strong")
