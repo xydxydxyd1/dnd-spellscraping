@@ -34,8 +34,13 @@ if __name__ == "__main__":
                         "html.parser") \
                         .find_all(id="page-content")[0]
 
-                # Spell description
-                print(spellpage_bs.find_all("p")[3].string)
+                # Spell description pars[desc_start:desc_end].string
+                pars = spellpage_bs.find_all("p")
+                desc_start = 3
+                desc_end = 4
+                while True:
+                    break
+                print(pars[desc_start:desc_end])
 
                 # Check for upcasting
                 spellpage_emp = spellpage_bs.find_all("strong")
