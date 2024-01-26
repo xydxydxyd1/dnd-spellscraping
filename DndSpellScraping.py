@@ -3,8 +3,18 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from pprint import pprint
-from time import sleep
 import csv
+
+# Parse the spell row for basic information
+def parse_spellrow(tdarr, spellinfo):
+    # TODO: parse better than string
+    spellinfo.append(spelllevel)                # Level
+    spellinfo.append(tdarr[0].text)    # Name
+    spellinfo.append(tdarr[1].text)    # School
+    spellinfo.append(tdarr[2].text)    # Casting time
+    spellinfo.append(tdarr[3].text)    # Range
+    spellinfo.append(tdarr[4].text)    # Duration
+    spellinfo.append(tdarr[5].text)    # Components
 
 # Parse the spell page for description, upcasting, and spelllists to be
 # appended to spellinfo
@@ -39,47 +49,21 @@ if __name__ == "__main__":
     html = page.read().decode("utf-8")
     pagesoup = BeautifulSoup(html, "html.parser")
 
+    # spellleveltable[i] is a table containing spells of level i
     spellleveltables = pagesoup.find_all('table')
-
-    maxspellinfo = []
-    maxspelllen = 0
-
-    #parse_spellpage("http://dnd5e.wikidot.com/spell:weird",
-    #                maxspellinfo)
-    #pprint(maxspellinfo)
 
     for spelllevel, spell_level_table in enumerate(spellleveltables):
         print(f"Going through spell level {spelllevel}")
         spells = spell_level_table.find_all('tr')
-        for spell in spells[1:]:
+        for spellrow in spells[1:]:
             spellinfo = []
-            spellinfo_bs = spell.find_all("td")
+            spellinfo_bs = spellrow.find_all("td")
 
-            # TODO: parse better than string
-            spellinfo.append(spelllevel)                # Level
-            spellinfo.append(spellinfo_bs[0].text)    # Name
-            spellinfo.append(spellinfo_bs[1].text)    # School
-            spellinfo.append(spellinfo_bs[2].text)    # Casting time
-            spellinfo.append(spellinfo_bs[3].text)    # Range
-            spellinfo.append(spellinfo_bs[4].text)    # Duration
-            spellinfo.append(spellinfo_bs[5].text)    # Components
+            parse_spellrow(spellrow, spellinfo)
 
-            # Navigate into spell page
+            # Navigate into spell page and parse it
             spellurl = wikidot_url + spellinfo_bs[0].a['href']
-            desclen = parse_spellpage(spellurl, spellinfo)
-            if (desclen > maxspelllen):
-                maxspelllen = desclen
-                maxspellinfo = spellinfo
-
-            #spelllists_start = desc_end
-
-            # Check for upcasting
-            #spellpage_emp = spellpage_bs.find_all("strong")
-            #if len(spellpage_emp) == 6:
-            #    spelllists_start += 1
+            parse_spellpage(spellurl, spellinfo)
 
             pprint(spellinfo)
-            #sleep(10)
         spelllevel += 1;
-
-    pprint(maxspellinfo)
