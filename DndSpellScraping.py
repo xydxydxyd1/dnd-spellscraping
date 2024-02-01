@@ -50,15 +50,15 @@ def extract_school(soup, spellinfo, tags):
         school = school[:-2]
         match soup.sup.text:
             case "D":
-                tags += "Dunamancy"
+                tags += "Dunamancy, "
             case "DG":
-                tags += "Graviturgy"
+                tags += "Graviturgy, "
             case "DC":
-                tags += "Chronurgy"
+                tags += "Chronurgy, "
             case "HB":
-                tags += "Homebrew"
+                tags += "Homebrew, "
             case "T":
-                tags += "Technomagic"
+                tags += "Technomagic, "
     spellinfo.append(school)
     return tags
 
@@ -121,6 +121,13 @@ def extract_description(spellpage_bs, spellinfo):
 
     spellinfo.append(desc)
     return desc_end
+
+# Extract dice roll and relevant abilities from description, appending
+# them to spellinfo.
+# Example: spellinfo.append("d8, DEX")
+def extract_dice_and_ability(desc, spellinfo):
+    return
+
 
 # Extract upcasting from spell page and append it to spellinfo.
 # Return the p tag after upcasting or the same tag if no upcasting
