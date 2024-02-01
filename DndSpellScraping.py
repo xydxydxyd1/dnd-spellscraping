@@ -6,6 +6,7 @@ from urllib.request import urlopen
 from pprint import pprint
 import csv
 from markdownify import MarkdownConverter
+import re
 
 class TableConverter(MarkdownConverter):
     """
@@ -31,16 +32,33 @@ def md(soup, **options):
 # Parse the spell row for basic information
 def parse_spellrow(tdarr, spellinfo, spelllevel):
     # TODO: parse better than string
-    tags = ""
+    tags = []
     spellinfo.append(spelllevel)                # Level
     spellinfo.append(tdarr[0].text)    # Name
-    tags = extract_school(tdarr[1], spellinfo, tags)
-    tags = extract_casttime(tdarr[2], spellinfo, tags)
+    extract_school(tdarr[1], spellinfo, tags)
+    extract_casttime(tdarr[2], spellinfo, tags)
     spellinfo.append(tdarr[3].text)    # Range
-    spellinfo.append(tdarr[4].text)    # Duration
+    extract_duration(tdarr[4], spellinfo, tags)
     spellinfo.append(tdarr[5].text)    # Components
 
-    spellinfo.append(tags)
+    spellinfo.append(", ".join(tags))
+
+# Parse the duration soup for duration and concentration
+# Append duration to spellinfo and return new tags
+def extract_duration(soup, spellinfo, tags):
+    duration = soup.text
+
+    if duration.startswith("Concentration"):
+        tags.append("Concentration")
+        con_pattern = re.compile("Concentration,? [uU]p to (.*)")
+        try:
+            duration = con_pattern.findall(duration)[0]
+        except Exception as e:
+            print("Duration is weird: ", duration)
+            duration = "None"
+
+    pprint(duration)
+    spellinfo.append(duration)
 
 # Parse the school soup for casting time and ritual
 # Append school to spellinfo and return new tags
@@ -50,27 +68,25 @@ def extract_school(soup, spellinfo, tags):
         school = school[:-2]
         match soup.sup.text:
             case "D":
-                tags += "Dunamancy, "
+                tags.append("Dunamancy")
             case "DG":
-                tags += "Graviturgy, "
+                tags.append("Graviturgy")
             case "DC":
-                tags += "Chronurgy, "
+                tags.append("Chronurgy")
             case "HB":
-                tags += "Homebrew, "
+                tags.append("Homebrew")
             case "T":
-                tags += "Technomagic, "
+                tags.append("Technomagic")
     spellinfo.append(school)
-    return tags
 
 # Parse the casting time soup for casting time and ritual
 # Append casting time to spellinfo and return new tags
 def extract_casttime(soup, spellinfo, tags):
     casttime = soup.text
     if soup.sup:
-        tags += "Ritual, "
+        tags.append("Ritual")
         casttime = casttime[:-2]
     spellinfo.append(casttime)
-    return tags
 
 # Parse the spell page for description, upcasting, and spelllists to be
 # appended to spellinfo
@@ -102,7 +118,8 @@ def parse_spellpage(url, spellinfo):
 
     #return len(desc)
 
-# Extract description from spell page soup and append it to spellinfo.
+# Extract description from spell page soup and append it to spellinfo,
+# and uses the extracted description to extract dice and ability
 # Return the soup tag after description (spell list or upcast)
 def extract_description(spellpage_bs, spellinfo):
     # Navigate to right before the first description tag
@@ -120,12 +137,26 @@ def extract_description(spellpage_bs, spellinfo):
         desc += md(sibling, strip=['a']) + "\n\n"
 
     spellinfo.append(desc)
+
+    extract_dice_and_ability(desc, spellinfo)
+
     return desc_end
 
 # Extract dice roll and relevant abilities from description, appending
 # them to spellinfo.
 # Example: spellinfo.append("d8, DEX")
 def extract_dice_and_ability(desc, spellinfo):
+    dice_and_ability = ""
+
+    abilities_pattern = re.compile(r"(?:Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)")
+    dice_pattern = re.compile(r'\b(\d?d\d+)\b')
+    abilities = ",".join(list(set(abilities_pattern.findall(desc))))
+    dicerolls = ",".join(list(set(dice_pattern.findall(desc))))
+    pprint(abilities)
+    pprint(dicerolls)
+
+    spellinfo.append(dicerolls)
+    spellinfo.append(abilities)
     return
 
 
@@ -164,8 +195,10 @@ if __name__ == "__main__":
     #spellinfo_bs = spellleveltables[8].find_all('tr')[7].find_all("td")
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
-    #parse_spellpage("http://dnd5e.wikidot.com/spell:nathairs-mischief-ua",
+
+    #parse_spellpage("http://dnd5e.wikidot.com/spell:mind-sliver",
     #                spellinfo)
+
     #pprint(spellinfo)
     #exit()
 
@@ -181,6 +214,8 @@ if __name__ == "__main__":
                 "Components",
                 "Tags",
                 "Description",
+                "Diceroll",
+                "Abilities",
                 "Upcasting",
                 "Spell Lists",
                 ]
