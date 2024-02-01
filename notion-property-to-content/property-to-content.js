@@ -52,6 +52,7 @@ async function processPage (page) {
   }
 
   const title = page.properties.Name.title[0].plain_text
+  console.log(`Processing: ${title}`)
 
   await notion.blocks.children.append({
     block_id: page.id,
@@ -68,8 +69,6 @@ async function processPage (page) {
       }
     })
   }
-
-  console.log(`Processed: ${title}`)
 }
 
 const iterator = paginate(notion.databases.query, { database_id: id })

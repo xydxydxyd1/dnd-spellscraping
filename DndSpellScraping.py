@@ -117,7 +117,7 @@ def extract_description(spellpage_bs, spellinfo):
             break
         if not isinstance(sibling, bs4.element.Tag):
             continue
-        desc += md(sibling) + "\n\n"
+        desc += md(sibling, strip=['a']) + "\n\n"
 
     spellinfo.append(desc)
     return desc_end
