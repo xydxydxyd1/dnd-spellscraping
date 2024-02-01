@@ -7,9 +7,26 @@ from pprint import pprint
 import csv
 from markdownify import MarkdownConverter
 
+class TableConverter(MarkdownConverter):
+    """
+    Custom markdown converter that correctly converts rows that span
+    multiple columns
+    """
+    def convert_td(self, el, text, convert_as_inline):
+        colspan = 1
+        if 'colspan' in el.attrs:
+            colspan = int(el['colspan'])
+        return ' ' + text + ' |' * colspan
+
+    def convert_th(self, el, text, convert_as_inline):
+        colspan = 1
+        if 'colspan' in el.attrs:
+            colspan = int(el['colspan'])
+        return ' ' + text + ' |' * colspan
+
 # Create shorthand method for conversion
 def md(soup, **options):
-    return MarkdownConverter(**options).convert_soup(soup)
+    return TableConverter(**options).convert_soup(soup)
 
 # Parse the spell row for basic information
 def parse_spellrow(tdarr, spellinfo, spelllevel):
@@ -136,10 +153,13 @@ if __name__ == "__main__":
     spellleveltables = pagesoup.find_all('table')
 
     # Test
-    #spellinfo_bs = spellleveltables[8].find_all('tr')[7].find_all("td")
     #spellinfo = []
+    #spellinfo_bs = spellleveltables[8].find_all('tr')[7].find_all("td")
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
+    #parse_spellpage("http://dnd5e.wikidot.com/spell:nathairs-mischief-ua",
+    #                spellinfo)
+    #pprint(spellinfo)
     #exit()
 
     with open('spells.csv', 'w', newline='') as csvfile:

@@ -1,2 +1,3 @@
 *.csv
 venv
+node_modules
