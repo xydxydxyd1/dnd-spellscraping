@@ -13,5 +13,5 @@ if [[ "$#" -ne 0 ]]; then
     exit 1
 fi
 
-export NOTION_TOKEN=secret_NNuHN0oqgI8GFcQHDl1SnKq4cpDbmZdXkEXgef5CGyH
+export NOTION_TOKEN=secret_use_your_token
 node property-to-content 0cee3500434b478ea667dc77ce96e88a Description
