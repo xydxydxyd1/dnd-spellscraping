@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "@notionhq/client": "^1.0.4",
-    "@tryfabric/martian": "^1.2.0"
+    "@tryfabric/martian": "^1.2.0",
+    "dotenv": "^16.4.1"
   }
 }

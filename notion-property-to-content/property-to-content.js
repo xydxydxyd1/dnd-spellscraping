@@ -2,6 +2,10 @@
 
 import { Client } from '@notionhq/client'
 import { markdownToBlocks } from '@tryfabric/martian'
+import dotenv from 'dotenv'
+
+// Load environment variables
+dotenv.config()
 
 if (process.argv.length < 4) {
   console.error('Usage: node property-to-content.js <database-id> <property> [--remove]')
@@ -44,7 +48,7 @@ async function processPage (page) {
     return
   }
 
-  let children = richText
+  let children = markdownToBlocks(richText)
 
   // Single text node, try to parse it
   if (richText.length === 1) {
@@ -70,6 +74,12 @@ async function processPage (page) {
     })
   }
 }
+
+// TEST
+const testPageId = "76af89fb30e64036b8336b2c88dc9dd8"
+const page = await notion.pages.retrieve({ page_id: testPageId })
+processPage(page)
+process.exit()
 
 const iterator = paginate(notion.databases.query, { database_id: id })
 
