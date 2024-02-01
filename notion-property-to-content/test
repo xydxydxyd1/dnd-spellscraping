@@ -13,4 +13,4 @@ if [[ "$#" -ne 0 ]]; then
     exit 1
 fi
 
-node property-to-content 0cee3500434b478ea667dc77ce96e88a Description
+node property-to-content 292989a6c1184336a87af47f0a0e0e23 Description
