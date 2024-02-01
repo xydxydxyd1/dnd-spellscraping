@@ -1,3 +1,4 @@
 *.csv
 venv
 node_modules
+test

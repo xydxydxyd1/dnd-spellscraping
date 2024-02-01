@@ -1,0 +1,17 @@
+#!/bin/bash
+# test 
+#
+while getopts "" opt; do
+    case $opt in
+	\?)
+	    echo "Invalid option: -$OPTARG" >&2
+	    ;;
+    esac
+done
+if [[ "$#" -ne 0 ]]; then
+    echo "Illegal number of parameters" >&2
+    exit 1
+fi
+
+export NOTION_TOKEN=secret_NNuHN0oqgI8GFcQHDl1SnKq4cpDbmZdXkEXgef5CGyH
+node property-to-content 0cee3500434b478ea667dc77ce96e88a Description
