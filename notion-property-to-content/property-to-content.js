@@ -85,41 +85,6 @@ async function processPage(page) {
   }
 }
 
-// TEST
-const nathair = `You fill a 20-foot cube centered on a point you choose within range with fey and draconic magic. Roll on the Mischievous Surge table to determine the magical effect produced. At the start of each of your turns, you can move the cube up to 10 feet and reroll on the table.
-
-| **Mischievous Surge** | |
-| --- | --- |
-| **d4** | **Effect** |
-| 1 | The smell of apple pie fills the air, and each creature in the cube must succeed on a Wisdom saving throw or become charmed by you until the start of your next turn. |
-| 2 | Bouquets of flowers appear all around, and each creature in the cube must succeed on a Dexterity saving throw or be blinded until the start of your next turn as the flowers spray water in their faces. |
-| 3 | Each creature in the cube must succeed on a Wisdom saving throw or begin giggling until the start of your next turn. A giggling creature is incapacitated and uses all its movement to move in a random direction. |
-| 4 | Drops of molasses appear and hover in the cube, turning it into difficult terrain until the start of your next turn. |
-`;
-const chaosBolt = `You hurl an undulating, warbling mass of chaotic energy at one creature in range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 + 1d6 damage. Choose one of the d8s. The number rolled on that die determines the attack's damage type, as shown below.
-
-| d8 | Damage Type |
-| --- | --- |
-| 1 | Acid |
-| 2 | Cold |
-| 3 | Fire |
-| 4 | Force |
-| 5 | Lightning |
-| 6 | Poison |
-| 7 | Psychic |
-| 8 | Thunder |
-
-
-If you roll the same number on both d8s, the chaotic energy leaps from the target to a different creature of your choice within 30 feet of it. Make a new attack roll against the new target, and make a new damage roll, which could cause the chaotic energy to leap again.
-
-A creature can be targeted only once by each casting of this spell.
-`
-inspectFull(markdownToBlocks(nathair));
-//const testPageId = "d41d26f9b86c46eeb6d05a8892a2dc6d"
-//const page = await notion.pages.retrieve({ page_id: testPageId })
-//await processPage(page)
-process.exit();
-
 const iterator = paginate(notion.databases.query, { database_id: id });
 
 for await (const query of iterator) {

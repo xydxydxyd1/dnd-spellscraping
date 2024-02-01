@@ -13,6 +13,33 @@ class TableConverter(MarkdownConverter):
     Custom markdown converter that correctly converts rows that span
     multiple columns
     """
+    def convert_tr(self, el, text, convert_as_inline):
+        cells = el.find_all(['td', 'th'])
+        is_headrow = all([cell.name == 'th' for cell in cells])
+        overline = ''
+        underline = ''
+        if is_headrow and not el.previous_sibling:
+            # first row and is headline: print headline underline
+            colcnt = 0
+            for cell in cells:
+                if "colspan" in cell.attrs:
+                    colcnt += int(cell["colspan"])
+                else:
+                    colcnt += 1
+
+            underline += '| ' + ' | '.join(['---'] * colcnt) + ' |' + '\n'
+        elif (not el.previous_sibling
+              and (el.parent.name == 'table'
+                   or (el.parent.name == 'tbody'
+                       and not el.parent.previous_sibling))):
+            # first row, not headline, and:
+            # - the parent is table or
+            # - the parent is tbody at the beginning of a table.
+            # print empty headline above this row
+            overline += '| ' + ' | '.join([''] * len(cells)) + ' |' + '\n'
+            overline += '| ' + ' | '.join(['---'] * len(cells)) + ' |' + '\n'
+        return overline + '|' + text + '\n' + underline
+
     def convert_td(self, el, text, convert_as_inline):
         colspan = 1
         if 'colspan' in el.attrs:
@@ -196,7 +223,7 @@ if __name__ == "__main__":
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
 
-    #parse_spellpage("http://dnd5e.wikidot.com/spell:mind-sliver",
+    #parse_spellpage("http://dnd5e.wikidot.com/spell:nathairs-mischief-ua",
     #                spellinfo)
 
     #pprint(spellinfo)
