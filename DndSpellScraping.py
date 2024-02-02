@@ -52,12 +52,12 @@ class TableConverter(MarkdownConverter):
             colspan = int(el['colspan'])
         return ' ' + text + ' |' * colspan
 
-# Create shorthand method for conversion
 def md(soup, **options):
+    """Shorthand method for converting bs4 to markdown"""
     return TableConverter(**options).convert_soup(soup)
 
-# Parse the spell row for basic information
 def parse_spellrow(tdarr, spellinfo, spelllevel):
+    """Parse the spell row for basic information"""
     # TODO: parse better than string
     tags = []
     spellinfo.append(spelllevel)                # Level
@@ -84,7 +84,6 @@ def extract_duration(soup, spellinfo, tags):
             print("Duration is weird: ", duration)
             duration = "None"
 
-    pprint(duration)
     spellinfo.append(duration)
 
 # Parse the school soup for casting time and ritual
@@ -113,19 +112,23 @@ def extract_casttime(soup, spellinfo, tags):
     if soup.sup:
         tags.append("Ritual")
         casttime = casttime[:-2]
-    spellinfo.append(casttime)
+    spellinfo.append(casttime.lower())
 
-# Parse the spell page for description, upcasting, and spelllists to be
-# appended to spellinfo
-# Return the length of the description
 def parse_spellpage(url, spellinfo):
+    """Parse the spell page for description, upcasting, and spelllists
+    to be appended to spellinfo
+
+    Return the length of the description
+    """
     spellpage_bs = BeautifulSoup(
             urlopen(url).read().decode("utf-8"),
             "html.parser") \
             .find_all(id="page-content")[0]
 
-    cursor = None;
+    extract_component(spellpage_bs, spellinfo)
 
+    # cursor helps parsing adjacent items
+    cursor = None;
     cursor = extract_description(spellpage_bs, spellinfo)
     cursor = extract_upcast(cursor, spellinfo)
     cursor = extract_spelllist(cursor, spellinfo)
@@ -144,6 +147,15 @@ def parse_spellpage(url, spellinfo):
     #spellinfo.append(desc)                      # Desc.
 
     #return len(desc)
+
+def extract_component(spellpage_bs, spellinfo):
+    """ Extract the material component from spell page soup and append
+    it to spellinfo
+    """
+    spell_specs = spellpage_bs.find_all("p")[2].text
+    comp_pattern = re.compile(r"^Components:.*\((.*)\).*$", re.MULTILINE)
+    component = comp_pattern.findall(spell_specs)
+    spellinfo.append(','.join(component))
 
 # Extract description from spell page soup and append it to spellinfo,
 # and uses the extracted description to extract dice and ability
@@ -179,8 +191,6 @@ def extract_dice_and_ability(desc, spellinfo):
     dice_pattern = re.compile(r'\b(\d?d\d+)\b')
     abilities = ",".join(list(set(abilities_pattern.findall(desc))))
     dicerolls = ",".join(list(set(dice_pattern.findall(desc))))
-    pprint(abilities)
-    pprint(dicerolls)
 
     spellinfo.append(dicerolls)
     spellinfo.append(abilities)
@@ -219,11 +229,12 @@ if __name__ == "__main__":
 
     # Test
     #spellinfo = []
+
     #spellinfo_bs = spellleveltables[8].find_all('tr')[7].find_all("td")
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
 
-    #parse_spellpage("http://dnd5e.wikidot.com/spell:nathairs-mischief-ua",
+    #parse_spellpage("http://dnd5e.wikidot.com/spell:revivify",
     #                spellinfo)
 
     #pprint(spellinfo)
@@ -240,6 +251,7 @@ if __name__ == "__main__":
                 "Duration",
                 "Components",
                 "Tags",
+                "Materials",
                 "Description",
                 "Diceroll",
                 "Abilities",
