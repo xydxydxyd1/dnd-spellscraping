@@ -64,11 +64,26 @@ def parse_spellrow(tdarr, spellinfo, spelllevel):
     spellinfo.append(tdarr[0].text)    # Name
     extract_school(tdarr[1], spellinfo, tags)
     extract_casttime(tdarr[2], spellinfo, tags)
-    spellinfo.append(tdarr[3].text)    # Range
+    extract_range_aoe(tdarr[3], spellinfo)
     extract_duration(tdarr[4], spellinfo, tags)
     spellinfo.append(tdarr[5].text)    # Components
 
     spellinfo.append(", ".join(tags))
+
+def extract_range_aoe(soup, spellinfo):
+    """ Extract area of effect from range soup and append them to
+    spellinfo
+    """
+    spellrange = soup.text
+    aoe = ""
+
+    range_pattern = re.compile(r"^(.*) \((.*)\).*$")
+    match = range_pattern.findall(soup.text)
+    if len(match) > 0:
+        spellrange, aoe = match[0]
+
+    spellinfo.append(spellrange)
+    spellinfo.append(aoe)
 
 # Parse the duration soup for duration and concentration
 # Append duration to spellinfo and return new tags
@@ -230,7 +245,7 @@ if __name__ == "__main__":
     # Test
     #spellinfo = []
 
-    #spellinfo_bs = spellleveltables[8].find_all('tr')[7].find_all("td")
+    #spellinfo_bs = spellleveltables[3].find_all('tr')[5].find_all("td")
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
 
@@ -248,6 +263,7 @@ if __name__ == "__main__":
                 "School",
                 "Cast Time",
                 "Range",
+                "AoE",
                 "Duration",
                 "Components",
                 "Tags",
