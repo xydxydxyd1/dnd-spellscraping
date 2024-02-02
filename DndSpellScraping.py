@@ -200,10 +200,8 @@ def extract_description(spellpage_bs, spellinfo):
 # them to spellinfo.
 # Example: spellinfo.append("d8, DEX")
 def extract_dice_and_ability(desc, spellinfo):
-    dice_and_ability = ""
-
     abilities_pattern = re.compile(r"(?:Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)")
-    dice_pattern = re.compile(r'\b(\d?d\d+)\b')
+    dice_pattern = re.compile(r'\b(\d*d\d+)\b')
     abilities = ",".join(list(set(abilities_pattern.findall(desc))))
     dicerolls = ",".join(list(set(dice_pattern.findall(desc))))
 
@@ -249,7 +247,7 @@ if __name__ == "__main__":
     #print(spellinfo_bs)
     #parse_spellrow(spellinfo_bs, spellinfo, 2)
 
-    #parse_spellpage("http://dnd5e.wikidot.com/spell:revivify",
+    #parse_spellpage("http://dnd5e.wikidot.com/spell:delayed-blast-fireball",
     #                spellinfo)
 
     #pprint(spellinfo)
